@@ -12,11 +12,7 @@ require 'plane'
         it 'responds to take_off method' do
           expect(subject).to respond_to(:takeoff)
         end
-
-        # it 'expects takeoff to change is_flying to true' do
-        #   subject.land
-        #   expect { subject.takeoff }.to change(subject, :is_flying?).from(false).to(true)
-        # end
+        
 
         it 'becomes airborne when take_off is called' do
           subject.land
