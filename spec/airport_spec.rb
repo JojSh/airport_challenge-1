@@ -2,65 +2,60 @@ require 'airport.rb'
 
 describe Airport do
 
-  let(:plane) { double(:plane,flying:true) }
+  let(:plane)   { double :plane, land: nil, takeoff: nil }
+  let(:weather) { double :weather }
 
-  describe '#instruct_to_land' do
-    it 'responds to instruct_to_land' do
-      expect(subject).to respond_to(:instruct_to_land).with(1).argument
-      # it { is_expected.to respond_to(:instruct_to_land) }
-    end
-
-    it 'calls the land method on passed argument (plane)' do
-      # allow(plane).to receive(:land)
-      # allow(plane).to receive(:is_flying?)
-      plane = Plane.new
-      subject.instruct_to_land(plane)
-      expect(plane.is_flying?).to eq false
-    end
-
-    # it 'reports confirmation that a landing has taken place' do     #TODO
-    #   expect(subject.instruct_to_land(plane)).to return("An airplane has landed.")
-    # end
+  before (:each) do
+    allow(weather).to receive(:is_stormy?).and_return(false)
   end
 
+  describe '#instruct_to_land' do
 
-  describe '#@capacity' do
-    it 'provides an area for planes to land in' do
-      # or responds to .capacity
-      expect(subject.capacity).to be_a(Array)
+    it 'calls the land method on passed argument (plane)' do
+      subject.instruct_to_land(weather, plane)
+        expect(plane).to have_received(:land)
     end
 
-    it 'receives landed planes into @capacity array' do
+    it 'reports confirmation that a landing has taken place' do
+      subject.instruct_to_land(weather, plane)
+      expect(subject.storage).to include(plane)
+    end
+
+    it 'prevents landing if the airport is full' do
+      allow(subject).to receive(:airport_full?).and_return(true)
+      expect { subject.instruct_to_land(weather, plane) }.to raise_error "Airport full."
+    end
+
+    it 'prevents landing when weather is stormy' do
+      allow(weather).to receive(:is_stormy?).and_return(true)
+      expect { subject.instruct_to_land(weather, plane) }.to raise_error "Too stormy."
+    end
+
+  end
+
+  describe '#@storage' do
+    it 'provides an area for planes to land in' do
+      expect(subject.storage).to be_a(Array)
+    end
+
+    it 'receives landed planes into @storage array' do
       allow(plane).to receive(:land)
-      subject.instruct_to_land(plane)
-      expect(subject.capacity.size).to be > 0
+      subject.instruct_to_land(weather, plane)
+      expect(subject.storage.size).to be > 0
     end
 
     describe '#instruct_takeoff' do
-      it 'responds to instruct_takeoff' do
-        expect(subject).to respond_to(:instruct_takeoff).with(1).argument
+
+      it 'does the plane take off?' do
+        subject.instruct_takeoff(weather, plane)
+        expect(subject.storage).to be_empty
       end
 
-      it 'calls the takeoff method on passed argument(plane)' do  #TODO
-        # allow(plane).to receive(:is_flying?)
-        # allow(plane).to receive(:land)
-        # subject.instruct_to_land(plane)
-        # allow(plane).to receive(:takeoff)
-        plane = Plane.new
-        subject.instruct_takeoff(plane)
-        expect(plane.is_flying?).to eq true
-      end
-
-      it 'can confirm that (plane) is no longer in airport @capacity' do
-        plane = Plane.new
-        subject.instruct_to_land(plane)
-        expect(subject.capacity.size).to be > 0
-        subject.instruct_takeoff(plane)
-        expect(subject.capacity.size).to eq(0)
+      it 'prevents takeoff when weather is stormy' do
+        allow(weather).to receive(:is_stormy?).and_return(true)
+        expect { subject.instruct_takeoff(weather, plane) }.to raise_error "Too stormy."
       end
 
     end
-
-
   end
 end

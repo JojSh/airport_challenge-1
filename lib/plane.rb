@@ -1,12 +1,10 @@
 class Plane
 
-  # attr_reader: flying
-
   def initialize(flying=true)
     @flying = flying
   end
 
-  def land  # setter method)
+  def land
     @flying = false
   end
 
@@ -14,7 +12,7 @@ class Plane
     @flying = true
   end
 
-  def is_flying? # getter method
+  def is_flying?
     @flying
   end
 

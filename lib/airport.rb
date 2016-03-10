@@ -1,22 +1,26 @@
-require_relative 'plane'
-
 class Airport
 
-  attr_reader :capacity
+  attr_reader :storage
 
   def initialize
-    @capacity = []
+    @storage = []
   end
 
-  def instruct_to_land(plane)
+  def airport_full?
+    @storage.length > 10 ? true : false
+  end
+
+  def instruct_to_land(weather, plane)
+    raise "Airport full." if airport_full?
+    raise "Too stormy." if weather.is_stormy?
     plane.land
-    @capacity << plane
-    # return "An airplane has landed."  #TODO
+    @storage << plane
   end
 
-  def instruct_takeoff(plane)
+  def instruct_takeoff(weather, plane)
+    raise "Too stormy." if weather.is_stormy?
     plane.takeoff
-    @capacity.pop
+    @storage.delete(plane)
   end
 
 end
